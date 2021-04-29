@@ -51,7 +51,7 @@ func init() {
 		httpReqsHistory,
 	)
 	go func() {
-		err := http.ListenAndServe(":1010", nil)
+		err := http.ListenAndServe(helper.GetCfgString("prometheus.address"), nil)
 		if err != nil {
 			helper.FatalLog(err.Error(), "")
 		}
@@ -60,7 +60,7 @@ func init() {
 
 func main() {
 	//配置网关链路追踪
-	_, closer, err := helper.NewJaegerTracer("go.micro.service.gateway", ":6831")
+	_, closer, err := helper.NewJaegerTracer("go.micro.service.gateway", helper.GetCfgString("jaeger.address"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func main() {
 
 	//服务发现
 	reg := etcdv3.NewRegistry(
-		registry.Addrs("127.0.0.1:2379"),
+		registry.Addrs(helper.GetCfgString("etcd.address")),
 	)
 
 	//配置微服务客户端链路追踪
