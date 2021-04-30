@@ -36,6 +36,7 @@ func main() {
 		micro.Registry(etcdv3.NewRegistry(registry.Addrs(helper.GetCfgString("etcd.address")))), // 服务发现
 	)
 	client.Init()
+	gin.SetMode(helper.GetCfgString("ginMode"))
 	g := gin.Default()
 
 	//初始化路由
