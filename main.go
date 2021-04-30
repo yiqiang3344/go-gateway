@@ -7,8 +7,8 @@ import (
 	"github.com/micro/go-micro/v2/web"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	"github.com/opentracing/opentracing-go"
+	"github.com/yiqiang3344/go-gateway/route"
 	"github.com/yiqiang3344/go-lib/helper"
-	"go-gateway/route"
 	"log"
 
 	wrapperTrace "github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
