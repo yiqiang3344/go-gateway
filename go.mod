@@ -1,8 +1,6 @@
-module xyf-gateway
+module go-gateway
 
 go 1.13
-
-replace xyf-lib => ../xyf-lib
 
 require (
 	github.com/garyburd/redigo v1.6.2 // indirect
@@ -13,5 +11,4 @@ require (
 	github.com/micro/go-plugins/wrapper/trace/opentracing/v2 v2.9.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.1.0
-	xyf-lib v0.0.0-00010101000000-000000000000
 )

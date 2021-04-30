@@ -6,7 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
 	"time"
-	"xyf-lib/helper"
+	"github.com/yiqiang3344/go-lib/helper"
 )
 
 type Func func(g *gin.Engine)

@@ -1,2 +1,4 @@
 config/local.yaml
 log/*
+go.mod
+go.sum

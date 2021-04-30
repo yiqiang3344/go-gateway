@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2"
-	xyfRobotSrvProto "xyf-lib/proto/xyf-robot-srv"
+	xyfRobotSrvProto 	"github.com/yiqiang3344/go-lib/proto/xyf-robot-srv"
 )
 
 type XyfRobotSrvRoute struct {
