@@ -45,7 +45,7 @@ func main() {
 	project := helper.GetCfgString("project")
 
 	//配置网关链路追踪
-	_, closer, err := helper.NewJaegerTracer("go.micro.api."+project, helper.GetCfgString("jaeger.address"))
+	_, closer, err := helper.InitJaegerTracer("go.micro.api."+project, helper.GetCfgString("jaeger.address"))
 	if err != nil {
 		log.Fatal(err)
 	}
