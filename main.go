@@ -8,13 +8,11 @@ import (
 	"github.com/micro/go-micro/v2/web"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	"github.com/opentracing/opentracing-go"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
-	"net/http"
 	"strconv"
 	"time"
 	"xyf-lib/helper"
-	pb "xyf-lib/proto/xyf-robot-srv"
+	xyfRobotSrvProto "xyf-lib/proto/xyf-robot-srv"
 
 	wrapperTrace "github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
 	"github.com/prometheus/client_golang/prometheus"
@@ -22,14 +20,7 @@ import (
 
 type handlerFunc func(c *gin.Context, ctx context.Context) int
 
-var httpReqsHistory = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-	Namespace:   "micro",
-	Subsystem:   "",
-	Name:        "srv_gateway_req_history",
-	Help:        "Histogram of response latency (seconds) of http handlers.",
-	ConstLabels: nil,
-	Buckets:     nil,
-}, []string{"method", "code"})
+var httpReqsHistory *prometheus.HistogramVec
 
 func runFunc(c *gin.Context, handlerFunc handlerFunc) {
 	//链路追踪
@@ -45,22 +36,16 @@ func runFunc(c *gin.Context, handlerFunc handlerFunc) {
 }
 
 func init() {
-	//配置网关请求监控
-	http.Handle("/metrics", promhttp.Handler())
-	prometheus.MustRegister(
-		httpReqsHistory,
-	)
-	go func() {
-		err := http.ListenAndServe(helper.GetCfgString("prometheus.address"), nil)
-		if err != nil {
-			helper.FatalLog(err.Error(), "")
-		}
-	}()
+	helper.InitCfg()
+	helper.InitLogger()
+	httpReqsHistory = helper.InitPrometheus()
 }
 
 func main() {
+	project := helper.GetCfgString("project")
+
 	//配置网关链路追踪
-	_, closer, err := helper.NewJaegerTracer("go.micro.service.gateway", helper.GetCfgString("jaeger.address"))
+	_, closer, err := helper.NewJaegerTracer("go.micro.api."+project, helper.GetCfgString("jaeger.address"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,7 +53,7 @@ func main() {
 
 	g := gin.Default()
 	service := web.NewService(
-		web.Name("go.micro.api.xyfRobotSrv"),
+		web.Name("go.micro.api."+project),
 		web.Address(":8888"),
 		web.Handler(g),
 	)
@@ -84,13 +69,13 @@ func main() {
 		micro.Registry(reg),
 	)
 	client.Init()
-	xyfRobotSrv := pb.NewXyfRobotSrvService("go.micro.service.xyfRobotSrv", client.Client())
+	xyfRobotSrv := xyfRobotSrvProto.NewXyfRobotSrvService("go.micro.service.xyfRobotSrv", client.Client())
 
 	v1 := g.Group("/robot")
 	{
 		v1.POST("/send-msg", func(c *gin.Context) {
 			runFunc(c, func(c *gin.Context, ctx context.Context) int {
-				req := new(pb.Request)
+				req := new(xyfRobotSrvProto.Request)
 				code := 200
 				if err := c.ShouldBind(req); err != nil {
 					code = 500
@@ -115,7 +100,7 @@ func main() {
 		})
 		v1.POST("/test", func(c *gin.Context) {
 			runFunc(c, func(c *gin.Context, ctx context.Context) int {
-				req := new(pb.TestRequest)
+				req := new(xyfRobotSrvProto.TestRequest)
 				code := 200
 				if err := c.ShouldBind(req); err != nil {
 					code = 500
