@@ -56,7 +56,7 @@ func main() {
 
 func initRoute(g *gin.Engine, client micro.Service) {
 	//机器人消息服务
-	new(route.XyfRobotSrvRoute).InitRoute("/robot", g, client)
+	new(route.RobotSrvRoute).InitRoute("/robot", g, client)
 
 	//...
 }

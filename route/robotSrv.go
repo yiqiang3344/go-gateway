@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type XyfRobotSrvRoute struct {
+type RobotSrvRoute struct {
 	*Route
 }
 
-func (e *XyfRobotSrvRoute) InitRoute(rootRoute string, g *gin.Engine, client micro.Service) {
+func (e *RobotSrvRoute) InitRoute(rootRoute string, g *gin.Engine, client micro.Service) {
 	xyfRobotSrv := xyfRobotSrvProto.NewXyfRobotSrvService("go.micro.service.xyfRobotSrv", client.Client())
 	v1 := g.Group(rootRoute)
 	{
