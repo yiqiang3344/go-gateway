@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2"
-	xyfRobotSrvProto 	"github.com/yiqiang3344/go-lib/proto/xyf-robot-srv"
+	xyfRobotSrvProto "github.com/yiqiang3344/go-lib/proto/xyf-robot-srv"
+	"time"
 )
 
 type XyfRobotSrvRoute struct {
@@ -67,6 +68,8 @@ func (e *XyfRobotSrvRoute) InitRoute(rootRoute string, g *gin.Engine, client mic
 		})
 		v1.POST("/test1", func(c *gin.Context) {
 			RunFunc(c, func(c *gin.Context, ctx context.Context) int {
+				time.Sleep(5 * time.Second)
+
 				code := 200
 				c.JSON(code, gin.H{
 					"status":  "1",
