@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2"
-	xyfRobotSrvProto "github.com/yiqiang3344/go-lib/proto/xyf-robot-srv"
+	robotSrvProto "github.com/yiqiang3344/go-lib/proto/robot-srv"
 	"time"
 )
 
@@ -13,12 +13,12 @@ type RobotSrvRoute struct {
 }
 
 func (e *RobotSrvRoute) InitRoute(rootRoute string, g *gin.Engine, client micro.Service) {
-	xyfRobotSrv := xyfRobotSrvProto.NewXyfRobotSrvService("go.micro.service.xyfRobotSrv", client.Client())
+	xyfRobotSrv := robotSrvProto.NewRobotSrvService("go.micro.service.robotSrv", client.Client())
 	v1 := g.Group(rootRoute)
 	{
 		v1.POST("/send-msg", func(c *gin.Context) {
 			RunFunc(c, func(c *gin.Context, ctx context.Context) int {
-				req := new(xyfRobotSrvProto.Request)
+				req := new(robotSrvProto.Request)
 				code := 200
 				if err := c.ShouldBind(req); err != nil {
 					code = 500
@@ -43,7 +43,7 @@ func (e *RobotSrvRoute) InitRoute(rootRoute string, g *gin.Engine, client micro.
 		})
 		v1.POST("/test", func(c *gin.Context) {
 			RunFunc(c, func(c *gin.Context, ctx context.Context) int {
-				req := new(xyfRobotSrvProto.TestRequest)
+				req := new(robotSrvProto.TestRequest)
 				code := 200
 				if err := c.ShouldBind(req); err != nil {
 					code = 500
