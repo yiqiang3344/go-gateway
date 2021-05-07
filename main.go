@@ -7,24 +7,33 @@ import (
 	"github.com/micro/go-micro/v2/web"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 	"github.com/yiqiang3344/go-gateway/route"
-	"github.com/yiqiang3344/go-lib/helper"
+	"github.com/yiqiang3344/go-lib/utils/config"
+	cLog "github.com/yiqiang3344/go-lib/utils/log"
+	"github.com/yiqiang3344/go-lib/utils/monitor"
+	"github.com/yiqiang3344/go-lib/utils/trace"
 	"log"
 
 	wrapperTrace "github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
 )
 
 func init() {
-	helper.InitCfg()
-	helper.InitLogger()
-	route.HttpReqsHistory = helper.InitPrometheus()
+	config.InitCfg()
+	cLog.InitLogger(config.GetCfgString("project"))
+	route.HttpReqsHistory = monitor.InitPrometheus()
 }
 
 func main() {
-	project := helper.GetCfgString("project")
+	project := config.GetCfgString("project")
 
 	//配置网关链路追踪
-	_, closer, err := helper.InitJaegerTracer("go.micro.api."+project, helper.GetCfgString("jaeger.address"))
+	_, closer, err := trace.InitJaegerTracer(
+		"go.micro.api."+project,
+		config.GetCfgString("jaeger.address"),
+		jaeger.SamplerTypeConst,
+		1,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,10 +42,10 @@ func main() {
 	//初始化micro客户端
 	client := micro.NewService(
 		micro.WrapClient(wrapperTrace.NewClientWrapper(opentracing.GlobalTracer())),             //配置微服务客户端链路追踪
-		micro.Registry(etcdv3.NewRegistry(registry.Addrs(helper.GetCfgString("etcd.address")))), // 服务发现
+		micro.Registry(etcdv3.NewRegistry(registry.Addrs(config.GetCfgString("etcd.address")))), // 服务发现
 	)
 	client.Init()
-	gin.SetMode(helper.GetCfgString("ginMode"))
+	gin.SetMode(config.GetCfgString("ginMode"))
 	g := gin.Default()
 
 	//初始化路由

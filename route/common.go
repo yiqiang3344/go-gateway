@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/yiqiang3344/go-lib/utils/trace"
 	"strconv"
 	"time"
-	"github.com/yiqiang3344/go-lib/helper"
 )
 
 type Func func(g *gin.Engine)
@@ -21,7 +21,7 @@ var HttpReqsHistory *prometheus.HistogramVec
 
 func RunFunc(c *gin.Context, handlerFunc handlerFunc) {
 	//链路追踪
-	ctx, sp := helper.NewGinContextAndSpan(c)
+	ctx, sp := trace.NewGinContextAndSpan(c)
 	defer sp.Finish()
 	start := time.Now()
 
